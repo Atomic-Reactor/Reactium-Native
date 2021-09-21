@@ -57,6 +57,7 @@
         "react-native-codegen": "^0.0.7",
         "react-test-renderer": "17.0.2"
     },
+    "reactiumDependencies": {},
     "jest": {
         "preset": "react-native"
     },
