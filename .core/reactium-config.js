@@ -28,12 +28,6 @@ module.exports = {
                 {
                     overwrite: true,
                     version: '>=0.0.1',
-                    destination: '/.eslintrc',
-                    source: '/tmp/.eslintrc',
-                },
-                {
-                    overwrite: true,
-                    version: '>=0.0.1',
                     destination: '/.prettierrc.js',
                     source: '/tmp/.prettierrc.js',
                 },
