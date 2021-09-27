@@ -79,6 +79,12 @@ module.exports = {
                     destination: '/ios/Podfile',
                     source: '/tmp/ios/Podfile',
                 },
+                {
+                    overwrite: true,
+                    version: '>=0.0.1',
+                    destination: '/ios/Podfile.lock',
+                    source: '/tmp/ios/Podfile.lock',
+                },
             ],
             remove: [],
         },
