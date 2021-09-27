@@ -88,5 +88,9 @@ module.exports = {
             ],
             remove: [],
         },
+        actinium: {
+            appID: 'Actinium',
+            serverURL: 'http://localhost:9000/api',
+        },
     },
 };

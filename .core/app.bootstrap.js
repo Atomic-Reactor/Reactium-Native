@@ -53,7 +53,11 @@ const App = () => {
     const [navigation, updateNavigation] = useState(null);
 
     const actiniumINIT = useCallback(() => {
-        const { appID, serverURL } = pkg.actinium;
+        const { appID, serverURL } = op.get(pkg, 'actinium', {
+            appID: null,
+            serverURL: null,
+        });
+        
         if (typeof serverURL === 'string' && typeof appID === 'string') {
             Reactium.setAsyncStorage(new MMKV());
             Reactium.serverURL = serverURL;
