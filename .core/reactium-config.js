@@ -20,7 +20,7 @@ module.exports = {
                     android: 'arcli start -t android',
                     ios: 'arcli start -t ios',
                 },
-                remove: [],
+                remove: ['android', 'ios', 'start'],
             },
         },
         files: {
