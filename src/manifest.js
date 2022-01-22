@@ -6,7 +6,6 @@
 
 module.exports = {
     hook: [
-		() => import('~/src/app/components/HomeScreen/reactium-hooks.js'),
-		() => import('~/src/app/components/TestScreen/reactium-hooks.js')
+		() => import('~/src/app/components/HomeScreen/reactium-hooks.js')
 	],
 };

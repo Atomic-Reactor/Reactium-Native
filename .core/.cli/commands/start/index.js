@@ -1,9 +1,8 @@
-const path = require('path');
-const chalk = require('chalk');
-const fs = require('fs-extra');
+const { fs, path } = arcli;
+
 const process = require('process');
+const { spawn } = require('child_process');
 const gulpConfig = require('../../../gulp.config');
-const { spawn, spawnSync } = require('child_process');
 
 const NAME = 'start';
 const DESC = 'Start the Metro & Gulp watchers';
@@ -63,8 +62,6 @@ const ACTION = async ({ opt, props }) => {
         'NODE_ENV=development',
         'gulp',
     ]).on('close', onClose('watch'));
-
-    let started = false;
 
     // Wait for the manifest file to be recreated
     // before we try to run react-native

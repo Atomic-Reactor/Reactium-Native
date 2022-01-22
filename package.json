@@ -33,7 +33,7 @@
         "xmlhttprequest": "1.8.0"
     },
     "devDependencies": {
-        "@atomic-reactor/cli": "^2.2.57",
+        "@atomic-reactor/cli": "^2.2.71",
         "@babel/cli": "^7.15.4",
         "@babel/core": "^7.12.9",
         "@babel/plugin-proposal-class-properties": "^7.10.4",

@@ -6,9 +6,7 @@
  */
 
 import op from 'object-path';
-const chalk = require('chalk');
 import pkg from '~/package.json';
-import { View } from 'react-native';
 import manifest from '~/src/manifest';
 import { MMKV } from 'react-native-mmkv';
 import { NavigationContainer } from '@react-navigation/native';
@@ -35,6 +33,7 @@ const BOOT_HOOKS = [
     'plugin-ready',
     'routes',
     'data-sync',
+    'app-ready',
 ];
 
 const Stack = createNativeStackNavigator();
@@ -45,6 +44,7 @@ const App = () => {
             init: false,
             previous: null,
             current: 'home',
+            updated: Date.now(),
         },
     });
 
@@ -57,7 +57,7 @@ const App = () => {
             appID: null,
             serverURL: null,
         });
-        
+
         if (typeof serverURL === 'string' && typeof appID === 'string') {
             Reactium.setAsyncStorage(new MMKV());
             Reactium.serverURL = serverURL;
@@ -71,26 +71,14 @@ const App = () => {
 
         console.log('');
         for (let hook of BOOT_HOOKS) {
-            const startTime = performance.now();
-
-            console.log(`Starting '${hook}' hook...`);
-            Reactium.Hook.runSync(hook);
-            await Reactium.Hook.run(hook);
-
-            const endTime = performance.now();
-            const diff = endTime - startTime;
-            const elapsed = Math.round((diff + Number.EPSILON) * 100) / 100;
-
-            console.log(`Finished '${hook}' after ${elapsed} ms`);
-            console.log('');
+            await runHook(hook);
         }
 
         setStatus(STATUS.READY);
     });
 
     const done = useCallback(async () => {
-        Reactium.Hook.runSync('ready');
-        await Reactium.Hook.run('ready');
+        await runHook('ready');
         setStatus(STATUS.DONE);
     });
 
@@ -127,6 +115,26 @@ const App = () => {
         }
     });
 
+    const runHook = useCallback(async hook => {
+        const startTime = performance.now();
+
+        console.log(`Starting '${hook}' hook...`);
+        Reactium.Hook.runSync(hook);
+
+        try {
+            await Reactium.Hook.run(hook);
+        } catch (err) {
+            console.log(err);
+        }
+
+        const endTime = performance.now();
+        const diff = endTime - startTime;
+        const elapsed = Math.round((diff + Number.EPSILON) * 100) / 100;
+
+        console.log(`Finished '${hook}' after ${elapsed} ms`);
+        console.log('');
+    });
+
     const runHooks = useCallback(async () => {
         for (let hook of manifest.hook) {
             try {
@@ -160,7 +168,10 @@ const App = () => {
         return true;
     });
 
-    useRegisterHandle('AppState', () => state);
+    useRegisterHandle('AppState', () => {
+        Reactium.Hook.runSync('app-state-extend', state);
+        return state;
+    });
 
     useEffect(() => {
         if (prevStatus === status) return;

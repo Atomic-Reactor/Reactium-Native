@@ -1,5 +1,4 @@
 const manifestGen = require('./manifest-gen');
-const fs = require('fs-extra');
 
 const reactiumTasks = (gulp, config, task) => {
     const manifest = done => {

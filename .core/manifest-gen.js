@@ -1,6 +1,5 @@
 const path = require('path');
 const fs = require('fs-extra');
-const op = require('object-path');
 const globby = require('./globby-patch').sync;
 
 let tmp = `
