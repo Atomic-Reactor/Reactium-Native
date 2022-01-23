@@ -1,3 +1,3 @@
 export default {
-    id: 'home',
+    name: 'home',
 };

@@ -9,9 +9,11 @@ import op from 'object-path';
 import pkg from '~/package.json';
 import manifest from '~/src/manifest';
 import { MMKV } from 'react-native-mmkv';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import Reactium, {
     ComponentEvent,
     useRegisterHandle,
@@ -40,6 +42,7 @@ const Stack = createNativeStackNavigator();
 
 const App = () => {
     const state = useSyncState({
+        hasActinium: false,
         route: {
             init: false,
             previous: null,
@@ -59,16 +62,17 @@ const App = () => {
         });
 
         if (typeof serverURL === 'string' && typeof appID === 'string') {
-            Reactium.setAsyncStorage(new MMKV());
-            Reactium.serverURL = serverURL;
+            Reactium.CoreManager.set('SERVER_URL', serverURL);
+            Reactium.setAsyncStorage(AsyncStorage);
             Reactium.initialize(appID);
+
+            return true;
         }
-    }, []);
+
+        return false;
+    });
 
     const bootup = useCallback(async () => {
-        actiniumINIT();
-        Reactium.Cache.load();
-
         console.log('');
         for (let hook of BOOT_HOOKS) {
             await runHook(hook);
@@ -119,10 +123,15 @@ const App = () => {
         const startTime = performance.now();
 
         console.log(`Starting '${hook}' hook...`);
-        Reactium.Hook.runSync(hook);
 
         try {
-            await Reactium.Hook.run(hook);
+            Reactium.Hook.runSync(hook, state);
+        } catch (err) {
+            console.log(err);
+        }
+
+        try {
+            await Reactium.Hook.run(hook, state);
         } catch (err) {
             console.log(err);
         }
@@ -168,10 +177,7 @@ const App = () => {
         return true;
     });
 
-    useRegisterHandle('AppState', () => {
-        Reactium.Hook.runSync('app-state-extend', state);
-        return state;
-    });
+    useRegisterHandle('AppState', () => state);
 
     useEffect(() => {
         if (prevStatus === status) return;
@@ -181,6 +187,8 @@ const App = () => {
                 break;
 
             case STATUS.BOOTUP:
+                state.set('hasActinium', actiniumINIT());
+                Reactium.Cache.load();
                 bootup();
                 break;
 

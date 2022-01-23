@@ -4,19 +4,19 @@ import Reactium from 'reactium-core/sdk';
 
 Reactium.Hook.registerSync('init', () => {
     console.log(
-        `\tInit hook called on domain: ${domain.id} reactium-hooks.js file`,
+        `\tInit hook called on domain: ${domain.name} reactium-hooks.js file`,
     );
 });
 
-Reactium.Route.register(domain.id, {
+Reactium.Route.register(domain.name, {
     component,
-    name: domain.id,
+    name: domain.name,
     options: {
         headerShown: false,
     },
 });
 
-Reactium.Style.register(domain.id, {
+Reactium.Style.register(domain.name, {
     container: {
         flex: 1,
         color: '#FFFFFF',
