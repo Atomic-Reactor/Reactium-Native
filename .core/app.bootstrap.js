@@ -8,14 +8,12 @@
 import op from 'object-path';
 import pkg from '~/package.json';
 import manifest from '~/src/manifest';
-import { MMKV } from 'react-native-mmkv';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NavigationContainer } from '@react-navigation/native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Reactium, {
     ComponentEvent,
+    useHookComponent,
     useRegisterHandle,
     useSyncState,
 } from 'reactium-core/sdk';
@@ -41,6 +39,8 @@ const BOOT_HOOKS = [
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+    const Navigator = useHookComponent('Navigator');
+
     const state = useSyncState({
         hasActinium: false,
         route: {
@@ -177,8 +177,6 @@ const App = () => {
         return true;
     });
 
-    useRegisterHandle('AppState', () => state);
-
     useEffect(() => {
         if (prevStatus === status) return;
         switch (status) {
@@ -208,24 +206,17 @@ const App = () => {
         }
     }, [navigation]);
 
-    return (
-        <>
-            <NavigationContainer ref={setNavigation}>
-                {shouldRender() ? (
-                    <Stack.Navigator
-                        screenListeners={{ focus: onRouteChange }}
-                        initialRouteName={state.get('route.current')}>
-                        {Reactium.Route.list.map((route, i) => (
-                            <Stack.Screen
-                                {...route}
-                                key={`route-${i}-${route.id}`}
-                            />
-                        ))}
-                    </Stack.Navigator>
-                ) : null}
-            </NavigationContainer>
-        </>
-    );
+    // External Interface: Extensions
+    state.extend('rerender', () => state.set('updated', Date.now()));
+    state.extend('routeChanged', onRouteChange);
+    state.extend('runHook', runHook);
+    state.extend('shouldRender', shouldRender);
+
+    // External Interface: register handle 'AppState'
+    useRegisterHandle('AppState', () => state);
+
+    // Renderer
+    return <Navigator ref={setNavigation} />;
 };
 
 export default App;
