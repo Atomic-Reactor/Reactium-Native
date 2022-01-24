@@ -1,11 +1,16 @@
 import React from 'react';
-import Reactium from 'reactium-core/sdk';
-import { Text, View } from 'react-native';
+import AnimatedSplash from 'react-native-animated-splash-screen';
 
-export default () => {
+export default ({ children, isLoaded = false }) => {
     return (
-        <View style={[Reactium.Style.get('home').container]}>
-            <Text style={[Reactium.Style.get('home').text]}>Reactium Splash Screen</Text>
-        </View>
+        <AnimatedSplash
+            translucent
+            logoWidth={96}
+            logoHeight={96}
+            isLoaded={isLoaded}
+            backgroundColor={'#262626'}
+            logoImage={require('./assets/logo.png')}>
+            {children}
+        </AnimatedSplash>
     );
 };

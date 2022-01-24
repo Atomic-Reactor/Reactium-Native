@@ -44,7 +44,7 @@ const App = () => {
         route: {
             init: false,
             previous: null,
-            current: 'splash',
+            current: 'home',
             updated: Date.now(),
         },
     });
@@ -87,8 +87,8 @@ const App = () => {
     const isStatus = useCallback(s => Boolean(s === status));
 
     const onRouteChange = useCallback(({ type, ...e }) => {
-        if (!navigation) return; 
-        
+        if (!navigation) return;
+
         const { name, params = {} } = navigation.getCurrentRoute() || {
             name: state.get('route.current'),
         };
@@ -213,7 +213,7 @@ const App = () => {
     useRegisterHandle('AppState', () => state);
 
     // Renderer
-    return <Navigator ref={setNavigation} />;
+    return <Navigator ref={setNavigation} isLoaded={shouldRender()} />;
 };
 
 export default App;

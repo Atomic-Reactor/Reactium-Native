@@ -16,21 +16,20 @@ let Navigator = (props, ref) => {
     };
 
     return (
-        <NavigationContainer ref={ref}>
-            <Stack.Navigator
-                initialRouteName={app.get('route.current')}
-                screenListeners={{ focus: app.routeChanged }}>
-                <Stack.Screen {...splashProps} />
-                {app.shouldRender()
-                    ? Reactium.Route.list.map((route, i) => (
-                          <Stack.Screen
-                              {...route}
-                              key={`route-${route.name}-${i}`}
-                          />
-                      ))
-                    : null}
-            </Stack.Navigator>
-        </NavigationContainer>
+        <Splash isLoaded={props.isLoaded}>
+            <NavigationContainer ref={ref}>
+                <Stack.Navigator
+                    screenListeners={{ focus: app.routeChanged }}
+                    initialRouteName={app.get('route.current')}>
+                    {Reactium.Route.list.map((route, i) => (
+                        <Stack.Screen
+                            {...route}
+                            key={`route-${i}-${route.id}`}
+                        />
+                    ))}
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Splash>
     );
 };
 
