@@ -8,7 +8,7 @@ export default ({ children, isLoaded = false }) => {
             logoWidth={96}
             logoHeight={96}
             isLoaded={isLoaded}
-            backgroundColor={'#262626'}
+            backgroundColor={'#FFFFFF'}
             logoImage={require('./assets/logo.png')}>
             {children}
         </AnimatedSplash>

@@ -11,7 +11,6 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		CB6C288A60093DFD9F4B7F1F /* libPods-ReactiumNative-ReactiumNativeTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DFFA894DD73350ED8C1F1BFC /* libPods-ReactiumNative-ReactiumNativeTests.a */; };
 		D22CF35F8AE79640FB046FC6 /* libPods-ReactiumNative.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 591244D42162441841C0736F /* libPods-ReactiumNative.a */; };
 /* End PBXBuildFile section */
@@ -39,7 +38,6 @@
 		2B5597DFCEC655246A617200 /* Pods-ReactiumNative.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactiumNative.release.xcconfig"; path = "Target Support Files/Pods-ReactiumNative/Pods-ReactiumNative.release.xcconfig"; sourceTree = "<group>"; };
 		591244D42162441841C0736F /* libPods-ReactiumNative.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ReactiumNative.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		62C863241EB7C82477244549 /* Pods-ReactiumNative.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactiumNative.debug.xcconfig"; path = "Target Support Files/Pods-ReactiumNative/Pods-ReactiumNative.debug.xcconfig"; sourceTree = "<group>"; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ReactiumNative/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C5131A61FBD1D199602F87FD /* Pods-ReactiumNative-ReactiumNativeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactiumNative-ReactiumNativeTests.release.xcconfig"; path = "Target Support Files/Pods-ReactiumNative-ReactiumNativeTests/Pods-ReactiumNative-ReactiumNativeTests.release.xcconfig"; sourceTree = "<group>"; };
 		DFFA894DD73350ED8C1F1BFC /* libPods-ReactiumNative-ReactiumNativeTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ReactiumNative-ReactiumNativeTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC131C146EC089585337C992 /* Pods-ReactiumNative-ReactiumNativeTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ReactiumNative-ReactiumNativeTests.debug.xcconfig"; path = "Target Support Files/Pods-ReactiumNative-ReactiumNativeTests/Pods-ReactiumNative-ReactiumNativeTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -90,7 +88,6 @@
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
 			name = ReactiumNative;
@@ -240,7 +237,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
