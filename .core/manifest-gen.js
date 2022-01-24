@@ -35,7 +35,7 @@ module.exports = config => {
         .filter(key => Boolean(key !== 'gulp'))
         .forEach(key => {
             const value = config.DDD[key];
-            globby(value).forEach(item => {
+            globby(value, { dot: true }).forEach(item => {
                 if (item.includes('.core/reactium-lib')) return;
 
                 manifest[key].push(

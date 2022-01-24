@@ -36,8 +36,6 @@ const BOOT_HOOKS = [
     'app-ready',
 ];
 
-const Stack = createNativeStackNavigator();
-
 const App = () => {
     const Navigator = useHookComponent('Navigator');
 
@@ -46,7 +44,7 @@ const App = () => {
         route: {
             init: false,
             previous: null,
-            current: 'home',
+            current: 'splash',
             updated: Date.now(),
         },
     });
@@ -89,6 +87,8 @@ const App = () => {
     const isStatus = useCallback(s => Boolean(s === status));
 
     const onRouteChange = useCallback(({ type, ...e }) => {
+        if (!navigation) return; 
+        
         const { name, params = {} } = navigation.getCurrentRoute() || {
             name: state.get('route.current'),
         };
@@ -186,7 +186,6 @@ const App = () => {
 
             case STATUS.BOOTUP:
                 state.set('hasActinium', actiniumINIT());
-                Reactium.Cache.load();
                 bootup();
                 break;
 
@@ -201,9 +200,7 @@ const App = () => {
     }, [status]);
 
     useEffect(() => {
-        if (navigation !== null) {
-            Reactium.Route.navigation = navigation;
-        }
+        Reactium.Navigator = navigation;
     }, [navigation]);
 
     // External Interface: Extensions

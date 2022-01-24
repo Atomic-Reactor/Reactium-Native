@@ -5,9 +5,7 @@ import { Text, View } from 'react-native';
 export default () => {
     return (
         <View style={[Reactium.Style.get('home').container]}>
-            <Text style={[Reactium.Style.get('home').text]}>
-                Reactium Native has arrived!
-            </Text>
+            <Text style={[Reactium.Style.get('home').text]}>Reactium Splash Screen</Text>
         </View>
     );
 };
