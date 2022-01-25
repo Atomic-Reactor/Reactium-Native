@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import Reactium, { useHandle, useHookComponent } from 'reactium-core/sdk';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -8,12 +8,6 @@ const Stack = createNativeStackNavigator();
 let Navigator = (props, ref) => {
     const app = useHandle('AppState');
     const Splash = useHookComponent('Splash');
-
-    const splashProps = {
-        name: 'splash',
-        component: Splash,
-        options: { headerShown: false },
-    };
 
     return (
         <Splash isLoaded={props.isLoaded}>

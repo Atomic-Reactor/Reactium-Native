@@ -88,6 +88,7 @@ const ACTION = async ({ opt, props }) => {
 
                 setTimeout(() => runCommand('node', cmd, opt), 5000);
             }
+            
         }
     }, 2000);
 };

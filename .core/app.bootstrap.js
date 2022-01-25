@@ -26,8 +26,8 @@ const STATUS = {
 };
 
 const BOOT_HOOKS = [
-    'sdk-init',
     'init',
+    'sdk-init',
     'dependencies',
     'plugin-dependencies',
     'plugin-ready',

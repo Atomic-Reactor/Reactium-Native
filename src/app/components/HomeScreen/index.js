@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Reactium from 'reactium-core/sdk';
-import { Text, View } from 'react-native';
+import { StatusBar, Text, View } from 'react-native';
 
 export default () => {
+    useEffect(() => {
+        setTimeout(() => {
+            StatusBar.setHidden(false);
+        }, 250);
+    }, []);
+
     return (
         <View style={[Reactium.Style.get('home').container]}>
+            <StatusBar {...Reactium.Style.get('StatusBar')} />
             <Text style={[Reactium.Style.get('home').text]}>
-                Reactium Native has arrived!
+                Hello Hoomans!
             </Text>
         </View>
     );

@@ -8,6 +8,7 @@ module.exports = {
     hook: [
 		() => import('~/.core/components/Navigator/reactium-hooks.js'),
 		() => import('~/.core/components/Splash/reactium-hooks.js'),
+		() => import('~/.core/components/UIKit/reactium-hooks.js'),
 		() => import('~/src/app/components/HomeScreen/reactium-hooks.js')
 	],
 };
