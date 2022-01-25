@@ -20,7 +20,7 @@ const runCommand = (
 ) => spawn(cmd, args, { stdio: [stdin, stdout, stderr] });
 
 const ACTION = async ({ opt, props }) => {
-    const { target } = opt;
+    const { simulator = 'iPhone 12', target } = opt;
 
     const crossEnvModulePath = path.resolve(
         path.dirname(require.resolve('cross-env')),
@@ -80,7 +80,13 @@ const ACTION = async ({ opt, props }) => {
                 setTimeout(() => {
                     runCommand(
                         'node',
-                        [crossEnvBin, 'react-native', targetDevice],
+                        [
+                            crossEnvBin,
+                            'react-native',
+                            targetDevice,
+                            '--simulator',
+                            simulator,
+                        ],
                         {
                             stdin: 'inherit',
                         },
@@ -96,7 +102,11 @@ const COMMAND = ({ program, props }) =>
         .command(NAME)
         .description(DESC)
         .action(opt => ACTION({ opt, props }))
-        .option('-t, --target [target]', 'Target device')
+        .option('-t, --target [target]', 'Target platform: ios|android')
+        .option(
+            '-s, --simulator [simulator]',
+            'Target device simulator: "--simulator="iPhone 12". Note: You should manually run the simulator before launching to ensure that it is available for development.',
+        )
         .on('--help', HELP);
 
 module.exports = {

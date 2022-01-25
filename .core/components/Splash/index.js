@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import SplashScreen from 'react-native-splash-screen';
 import AnimatedSplash from 'react-native-animated-splash-screen';
 
 export default ({ children, isLoaded = false }) => {
+    useEffect(() => {
+        SplashScreen.hide();
+    }, []);
+
     return (
         <AnimatedSplash
             translucent

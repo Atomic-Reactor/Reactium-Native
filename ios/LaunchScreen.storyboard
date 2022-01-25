@@ -18,11 +18,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Image" translatesAutoresizingMaskIntoConstraints="NO" id="0db-f7-mVS">
-                                <rect key="frame" x="140" y="286" width="95" height="95"/>
+                                <rect key="frame" x="148" y="294" width="79" height="79"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="95" id="HV4-m0-jZq"/>
-                                    <constraint firstAttribute="height" constant="95" id="z0B-9I-O9N"/>
+                                    <constraint firstAttribute="width" constant="79" id="8MG-Uh-57v"/>
+                                    <constraint firstAttribute="width" secondItem="0db-f7-mVS" secondAttribute="height" multiplier="1:1" id="Fhs-I3-Q2i"/>
+                                    <constraint firstAttribute="height" constant="79" id="agt-Ah-wG4"/>
                                 </constraints>
                                 <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="default"/>
                             </imageView>
@@ -30,10 +31,10 @@
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="0db-f7-mVS" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="GPL-jR-RU3"/>
-                            <constraint firstItem="0db-f7-mVS" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="286" id="IG4-MO-anL"/>
-                            <constraint firstItem="0db-f7-mVS" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="MUe-ug-Zja"/>
-                            <constraint firstItem="0db-f7-mVS" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="140" id="iEz-Qf-fyA"/>
+                            <constraint firstItem="0db-f7-mVS" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="148" id="fFb-A9-eZs"/>
+                            <constraint firstItem="0db-f7-mVS" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="294" id="oZ1-l4-ZXa"/>
+                            <constraint firstItem="0db-f7-mVS" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="vD3-HX-WKV"/>
+                            <constraint firstItem="0db-f7-mVS" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="zXZ-bB-7fL"/>
                         </constraints>
                     </view>
                 </viewController>
