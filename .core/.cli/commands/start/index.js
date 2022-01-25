@@ -68,30 +68,25 @@ const ACTION = async ({ opt, props }) => {
     const ival = setInterval(() => {
         if (fs.existsSync(manifestfile)) {
             clearInterval(ival);
+            const opt = { stdin: 'inherit' };
+
             commands.start = runCommand(
                 'node',
                 [crossEnvBin, 'react-native', 'start', '--reset-cache'],
-                { stdin: 'inherit' },
+                opt,
             ).on('close', onClose('start'));
 
             if (target) {
                 const targetDevice = String(`run-${target}`).toLowerCase();
 
-                setTimeout(() => {
-                    runCommand(
-                        'node',
-                        [
-                            crossEnvBin,
-                            'react-native',
-                            targetDevice,
-                            '--simulator',
-                            simulator,
-                        ],
-                        {
-                            stdin: 'inherit',
-                        },
-                    );
-                }, 5000);
+                const cmd = [crossEnvBin, 'react-native', targetDevice];
+
+                if (target === 'ios') {
+                    cmd.push('--simulator');
+                    cmd.push(simulator);
+                }
+
+                setTimeout(() => runCommand('node', cmd, opt), 5000);
             }
         }
     }, 2000);

@@ -18,7 +18,7 @@ module.exports = {
             scripts: {
                 add: {
                     android: 'arcli start -t android',
-                    ios: 'arcli start -t ios',
+                    ios: 'arcli start -t ios -s "iPhone 12"',
                 },
                 remove: ['android', 'ios', 'start'],
             },
