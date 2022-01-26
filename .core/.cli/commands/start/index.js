@@ -20,7 +20,7 @@ const runCommand = (
 ) => spawn(cmd, args, { stdio: [stdin, stdout, stderr] });
 
 const ACTION = async ({ opt, props }) => {
-    const { simulator = 'iPhone 12', target } = opt;
+    const { simulator = 'iPhone 12', target, verbose } = opt;
 
     const crossEnvModulePath = path.resolve(
         path.dirname(require.resolve('cross-env')),
@@ -81,6 +81,10 @@ const ACTION = async ({ opt, props }) => {
 
                 const cmd = [crossEnvBin, 'react-native', targetDevice];
 
+                if (verbose === true) {
+                    cmd.push('--verbose');
+                }
+
                 if (target === 'ios') {
                     cmd.push('--simulator');
                     cmd.push(simulator);
@@ -98,6 +102,7 @@ const COMMAND = ({ program, props }) =>
         .command(NAME)
         .description(DESC)
         .action(opt => ACTION({ opt, props }))
+        .option('-V, --verbose [verbose]', 'Run with verbose logging enabled')
         .option('-t, --target [target]', 'Target platform: ios|android')
         .option(
             '-s, --simulator [simulator]',
