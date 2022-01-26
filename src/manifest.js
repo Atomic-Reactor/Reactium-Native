@@ -11,4 +11,7 @@ module.exports = {
 		() => import('~/.core/components/UIKit/reactium-hooks.js'),
 		() => import('~/src/app/components/HomeScreen/reactium-hooks.js')
 	],
+	metro: [
+		() => import('~/.core/components/SVG/reactium-metro.js')
+	],
 };
