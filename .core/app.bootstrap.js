@@ -142,7 +142,7 @@ const App = () => {
             console.log(err);
         }
 
-        if (hook === 'init') actiniumINIT();s
+        if (hook === 'init') actiniumINIT();
 
         const endTime = performance.now();
         const diff = endTime - startTime;
