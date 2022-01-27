@@ -40,7 +40,7 @@ const App = () => {
     const Navigator = useHookComponent('Navigator');
 
     const state = useSyncState({
-        hasActinium: false,
+        actinium: false,
         route: {
             init: false,
             previous: null,
@@ -54,20 +54,14 @@ const App = () => {
     const [navigation, updateNavigation] = useState(null);
 
     const actiniumINIT = useCallback(() => {
-        const { appID, serverURL } = op.get(pkg, 'actinium', {
-            appID: null,
-            serverURL: null,
-        });
+        const appID = op.get(pkg, 'actinium.appID');
+        const serverURL = op.get(pkg, 'actinium.serverURL');
 
-        if (typeof serverURL === 'string' && typeof appID === 'string') {
-            Reactium.CoreManager.set('SERVER_URL', serverURL);
-            Reactium.setAsyncStorage(AsyncStorage);
-            Reactium.initialize(appID);
+        if (!state.get('actinium') || !appID || !serverURL) return;
 
-            return true;
-        }
-
-        return false;
+        Reactium.CoreManager.set('SERVER_URL', serverURL);
+        Reactium.setAsyncStorage(AsyncStorage);
+        Reactium.initialize(appID);
     });
 
     const bootup = useCallback(async () => {
@@ -85,6 +79,18 @@ const App = () => {
     });
 
     const isStatus = useCallback(s => Boolean(s === status));
+
+    const loadHooks = useCallback(async () => {
+        for (let hook of manifest.hook) {
+            try {
+                await hook();
+            } catch (err) {
+                console.log('Error running hook:', hook);
+            }
+        }
+
+        setStatus(STATUS.BOOTUP);
+    });
 
     const onRouteChange = useCallback(({ type, ...e }) => {
         if (!navigation) return;
@@ -136,24 +142,14 @@ const App = () => {
             console.log(err);
         }
 
+        if (hook === 'init') actiniumINIT();s
+
         const endTime = performance.now();
         const diff = endTime - startTime;
         const elapsed = Math.round((diff + Number.EPSILON) * 100) / 100;
 
         console.log(`Finished '${hook}' after ${elapsed} ms`);
         console.log('');
-    });
-
-    const runHooks = useCallback(async () => {
-        for (let hook of manifest.hook) {
-            try {
-                await hook();
-            } catch (err) {
-                console.log('Error running hook:', hook);
-            }
-        }
-
-        setStatus(STATUS.BOOTUP);
     });
 
     const setNavigation = useCallback(value => {
@@ -181,11 +177,10 @@ const App = () => {
         if (prevStatus === status) return;
         switch (status) {
             case STATUS.STARTING:
-                runHooks();
+                loadHooks();
                 break;
 
             case STATUS.BOOTUP:
-                state.set('hasActinium', actiniumINIT());
                 bootup();
                 break;
 
@@ -193,10 +188,8 @@ const App = () => {
                 done();
                 break;
         }
-    }, [status]);
 
-    useEffect(() => {
-        if (prevStatus !== status) setPrevStatus(status);
+        setPrevStatus(status);
     }, [status]);
 
     useEffect(() => {
