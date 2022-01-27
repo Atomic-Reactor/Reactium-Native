@@ -4,12 +4,6 @@ import Reactium from 'reactium-core/sdk';
 import { StyleSheet } from 'react-native';
 
 (() => {
-    Reactium.Hook.registerSync('init', () => {
-        console.log(
-            `\tInit hook called on domain: ${domain.name} reactium-hooks.js file`,
-        );
-    });
-
     Reactium.Route.register(domain.name, {
         component,
         name: domain.name,
