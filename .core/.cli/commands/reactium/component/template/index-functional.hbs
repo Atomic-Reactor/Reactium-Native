@@ -1,0 +1,24 @@
+/**
+ * -----------------------------------------------------------------------------
+ * {{name}}
+ * -----------------------------------------------------------------------------
+ */
+
+import React, { useEffect } from 'react';
+import { Text, View } from 'react-native';
+import Reactium, { useHandle, useSyncState } from 'reactium-core/sdk';
+
+export default () => {
+    const app = useHandle('app');
+
+    const state = useSyncState({});
+
+    useEffect(() => {}, []);
+
+    return (
+        <View>
+            <Text>{{name}}</Text>
+        </View>
+    );
+};
+

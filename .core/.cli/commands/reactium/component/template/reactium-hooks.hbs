@@ -1,0 +1,37 @@
+{{#if route}}import component from './';{{/if}}
+import domain from './domain';
+import Reactium from 'reactium-core/sdk';
+{{#if style}}import { StyleSheet } from 'react-native';{{/if}}
+
+(async () => {
+    {{#if route}}
+    Reactium.Route.register(
+        domain.name,
+        {
+            component,
+            name: '{{route}}',
+            permission: {
+                roles: 'user',
+            },
+            options: {
+                headerShown: false,
+            },
+            order: Reactium.Enums.priority.neutral,
+        },
+    );
+    {{/if}}
+    {{#if style}}
+    Reactium.Style.register(
+        {{#if route}}'{{route}}'{{else}}domain.name{{/if}},
+        StyleSheet.create({
+            container: {
+                flex: 1,
+                padding: 24,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#FFFFFF',
+            },
+        }),
+    );
+    {{/if}}
+})();

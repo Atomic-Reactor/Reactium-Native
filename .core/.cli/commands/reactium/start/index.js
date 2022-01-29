@@ -2,7 +2,7 @@ const { fs, path } = arcli;
 
 const process = require('process');
 const { spawn } = require('child_process');
-const gulpConfig = require('../../../gulp.config');
+const gulpConfig = require('../../../../gulp.config');
 
 const NAME = 'start';
 const DESC = 'Start the Metro & Gulp watchers';
