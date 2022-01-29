@@ -5,8 +5,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator();
 
-let Navigator = (props, ref) => {
-    const app = useHandle('AppState');
+let Navigator = ({ route = 'home', ...props }, ref) => {
+
+    const app = useHandle('app');
     const Splash = useHookComponent('Splash');
 
     return (
@@ -14,7 +15,7 @@ let Navigator = (props, ref) => {
             <NavigationContainer ref={ref}>
                 <Stack.Navigator
                     screenListeners={{ focus: app.routeChanged }}
-                    initialRouteName={app.get('route.current')}>
+                    initialRouteName={route}>
                     {Reactium.Route.list.map((route, i) => (
                         <Stack.Screen
                             {...route}

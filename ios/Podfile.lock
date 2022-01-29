@@ -11,6 +11,9 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.65.1)
   - fmt (6.2.1)
   - glog (0.3.5)
+  - MMKV (1.2.12):
+    - MMKVCore (~> 1.2.12)
+  - MMKVCore (1.2.12)
   - RCT-Folly (2021.04.26.00):
     - boost-for-react-native
     - DoubleConversion
@@ -208,6 +211,9 @@ PODS:
   - React-jsinspector (0.65.1)
   - react-native-blur (0.8.0):
     - React
+  - react-native-mmkv (2.0.1):
+    - MMKV
+    - React-Core
   - react-native-netinfo (7.1.9):
     - React-Core
   - react-native-safe-area-context (3.3.2):
@@ -342,6 +348,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
+  - react-native-mmkv (from `../node_modules/react-native-mmkv`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
@@ -371,6 +378,8 @@ SPEC REPOS:
   trunk:
     - boost-for-react-native
     - fmt
+    - MMKV
+    - MMKVCore
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -405,6 +414,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-blur:
     :path: "../node_modules/@react-native-community/blur"
+  react-native-mmkv:
+    :path: "../node_modules/react-native-mmkv"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-safe-area-context:
@@ -461,6 +472,8 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: df8f81d2a7541ee6755a047b398a5cb5a72acd0e
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 5337263514dd6f09803962437687240c5dc39aa4
+  MMKV: f281020c9d9be5eb7a03ae746dc4deb570e46c23
+  MMKVCore: df0565f6b58463604731a68ba6cd89bc0b2d1d55
   RCT-Folly: 0dd9e1eb86348ecab5ba76f910b56f4b5fef3c46
   RCTRequired: 6cf071ab2adfd769014b3d94373744ee6e789530
   RCTTypeSafety: b829c59453478bb5b02487b8de3336386ab93ab1
@@ -473,6 +486,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 43f2542aed3c26e42175b339f8d37fe3dd683765
   React-jsinspector: 41e58e5b8e3e0bf061fdf725b03f2144014a8fb0
   react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
+  react-native-mmkv: bb1b8057949b5318bca2c0f6ba832051b713403c
   react-native-netinfo: 87e5bfaf21ea5c6c110941290aa481dd8e849f98
   react-native-safe-area-context: 584dc04881deb49474363f3be89e4ca0e854c057
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457

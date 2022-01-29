@@ -5,14 +5,17 @@
  * @flow strict-local
  */
 
+import _ from 'underscore';
 import op from 'object-path';
 import pkg from '~/package.json';
 import manifest from '~/src/manifest';
+import { AppState } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Reactium, {
     ComponentEvent,
+    useEventEffect,
     useHookComponent,
     useRegisterHandle,
     useSyncState,
@@ -41,13 +44,17 @@ const App = () => {
 
     const state = useSyncState({
         actinium: false,
+        appstate: 'active',
         route: {
             init: false,
             previous: null,
             current: 'home',
             updated: Date.now(),
         },
+        user: null,
     });
+
+    const dispatch = Reactium.useDispatcher({ state });
 
     const [prevStatus, setPrevStatus] = useState();
     const [status, setStatus] = useState(STATUS.STARTING);
@@ -92,6 +99,25 @@ const App = () => {
         setStatus(STATUS.BOOTUP);
     });
 
+    const onAppState = useCallback(current => {
+        const isActive = current === 'active';
+
+        current = !isActive ? 'inactive' : current;
+
+        const previous = state.get('appstate', 'active');
+
+        if (previous === current) return;
+
+        state.set('appstate', current);
+
+        if (!isActive) {
+            Reactium.LocalStorage.set('state', state.get());
+        }
+
+        dispatch(`appstate-${current}`);
+        dispatch('appstate', { current, previous });
+    });
+
     const onRouteChange = useCallback(({ type, ...e }) => {
         if (!navigation) return;
 
@@ -125,24 +151,68 @@ const App = () => {
         }
     });
 
-    const runHook = useCallback(async hook => {
+    const onStateChange = useCallback(({ path: key, value, ...event }) => {
+        key = key === 'undefiend' || !key ? event.__path : key;
+        if (key === 'undefined' || !key) return;
+        dispatch('change', { key, value });
+    }, []);
+
+    const perm = ({ role, level, id }) => {};
+
+    const runHook = useCallback(async (hook, options) => {
+        const defaultOptions = {
+            event: true,
+            synchronous: true,
+            asynchronous: true,
+        };
+
+        options = _.isObject(options)
+            ? { ...defaultOptions, ...options }
+            : defaultOptions;
+
         const startTime = performance.now();
 
         console.log(`Starting '${hook}' hook...`);
 
-        try {
-            Reactium.Hook.runSync(hook, state);
-        } catch (err) {
-            console.log(err);
+        const includeHooks = BOOT_HOOKS.includes(hook);
+
+        if (options.event === true) {
+            dispatch(hook, {
+                BOOT_HOOKS: includeHooks ? BOOT_HOOKS : undefined,
+            });
         }
 
-        try {
-            await Reactium.Hook.run(hook, state);
-        } catch (err) {
-            console.log(err);
+        if (options.synchronous === true) {
+            try {
+                Reactium.Hook.runSync(
+                    hook,
+                    state,
+                    includeHooks ? BOOT_HOOKS : null,
+                );
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        if (options.asynchronous === true) {
+            try {
+                await Reactium.Hook.run(
+                    hook,
+                    state,
+                    includeHooks ? BOOT_HOOKS : null,
+                );
+            } catch (err) {
+                console.log(err);
+            }
         }
 
         if (hook === 'init') actiniumINIT();
+
+        if (hook === 'sdk-init') {
+            if (!state.get('actinium')) return;
+            const user = await Reactium.User.currentAsync();
+            state.set('user', user ? user.id : false);
+        }
 
         const endTime = performance.now();
         const diff = endTime - startTime;
@@ -173,6 +243,7 @@ const App = () => {
         return true;
     });
 
+    // Status change
     useEffect(() => {
         if (prevStatus === status) return;
         switch (status) {
@@ -192,9 +263,22 @@ const App = () => {
         setPrevStatus(status);
     }, [status]);
 
+    // Navigation created
     useEffect(() => {
         Reactium.Navigator = navigation;
     }, [navigation]);
+
+    // AppState change
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', onAppState);
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
+    // state change
+    useEventEffect(state, { set: onStateChange });
 
     // External Interface: Extensions
     state.extend('rerender', () => state.set('updated', Date.now()));
@@ -203,10 +287,16 @@ const App = () => {
     state.extend('shouldRender', shouldRender);
 
     // External Interface: register handle 'AppState'
-    useRegisterHandle('AppState', () => state);
+    useRegisterHandle('app', () => state);
 
     // Renderer
-    return <Navigator ref={setNavigation} isLoaded={shouldRender()} />;
+    return (
+        <Navigator
+            ref={setNavigation}
+            isLoaded={shouldRender()}
+            route={state.get('route.current')}
+        />
+    );
 };
 
 export default App;

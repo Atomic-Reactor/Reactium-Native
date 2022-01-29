@@ -1,7 +1,6 @@
 import domain from './domain';
 import Component from './index';
 import Reactium from 'reactium-core/sdk';
-// import { StyleSheet } from 'react-native';
 
 (() => {
     Reactium.Component.register(
