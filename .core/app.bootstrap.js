@@ -11,17 +11,18 @@ import pkg from '~/package.json';
 import manifest from '~/src/manifest';
 import { AppState } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Reactium, {
     ComponentEvent,
     useEventEffect,
     useHookComponent,
     useRegisterHandle,
+    useStatus,
     useSyncState,
 } from 'reactium-core/sdk';
 
 const STATUS = {
+    PENDING: 0,
     STARTING: 1,
     BOOTUP: 2,
     READY: 3,
@@ -38,12 +39,17 @@ const BOOT_HOOKS = [
     'data-sync',
     'app-ready',
 ];
+const logout = Reactium.User.logOut;
+
+const appID = op.get(pkg, 'actinium.appID');
+const serverURL = op.get(pkg, 'actinium.serverURL');
+const actinium = Boolean(appID && serverURL);
 
 const App = () => {
     const Navigator = useHookComponent('Navigator');
 
     const state = useSyncState({
-        actinium: false,
+        actinium,
         appstate: 'active',
         route: {
             init: false,
@@ -51,25 +57,70 @@ const App = () => {
             current: 'home',
             updated: Date.now(),
         },
-        user: null,
+        userINIT: false,
     });
+
+    state.User = Reactium.User;
 
     const dispatch = Reactium.useDispatcher({ state });
+    const [status, setStatus, isStatus, getStatus] = useStatus(STATUS.STARTING);
 
-    const [prevStatus, setPrevStatus] = useState();
-    const [status, setStatus] = useState(STATUS.STARTING);
     const [navigation, updateNavigation] = useState(null);
 
-    const actiniumINIT = useCallback(() => {
-        const appID = op.get(pkg, 'actinium.appID');
-        const serverURL = op.get(pkg, 'actinium.serverURL');
+    const can = (params, strict) => {
+        let u = state.User.current();
 
-        if (!state.get('actinium') || !appID || !serverURL) return;
+        if (!u) return false;
+        u = u.toJSON();
 
-        Reactium.CoreManager.set('SERVER_URL', serverURL);
-        Reactium.setAsyncStorage(AsyncStorage);
-        Reactium.initialize(appID);
-    });
+        const userRoles = Object.keys(u.roles);
+
+        // is admin?
+        const admins = ['super-admin', 'administrator'];
+        if (_.intersection(userRoles, admins).length > 0) {
+            return true;
+        }
+
+        params = params || {};
+
+        let score = 0;
+        let max = 0;
+
+        let roles = op.get(params, 'roles', []);
+        roles = _.isString(roles) ? [roles] : roles;
+        if (roles.length > 0) {
+            max += 1;
+            if (_.intersection(userRoles, roles).length > 0) {
+                score += 1;
+            }
+        }
+
+        const userCaps = _.pluck(u.capabilities, 'group');
+        let caps = op.get(params, 'capabilities', []);
+        caps = _.isString(caps) ? [caps] : caps;
+        if (caps.length > 0) {
+            max += 1;
+            if (_.intersection(userCaps, caps).length > 0) {
+                score += 1;
+            }
+        }
+
+        const userLevel = _.max(Object.values(u.roles));
+        const level = op.get(params, 'level', 0);
+        if (level > 0) {
+            max += 1;
+
+            if (userLevel >= level) {
+                score += 1;
+            }
+        }
+
+        if (strict === true && score < max) {
+            return false;
+        }
+
+        return strict !== true && score > 0;
+    };
 
     const bootup = useCallback(async () => {
         console.log('');
@@ -77,15 +128,13 @@ const App = () => {
             await runHook(hook);
         }
 
-        setStatus(STATUS.READY);
+        setStatus(STATUS.READY, true);
     });
 
     const done = useCallback(async () => {
         await runHook('ready');
-        setStatus(STATUS.DONE);
+        setStatus(STATUS.DONE, true);
     });
-
-    const isStatus = useCallback(s => Boolean(s === status));
 
     const loadHooks = useCallback(async () => {
         for (let hook of manifest.hook) {
@@ -96,7 +145,7 @@ const App = () => {
             }
         }
 
-        setStatus(STATUS.BOOTUP);
+        setStatus(STATUS.BOOTUP, true);
     });
 
     const onAppState = useCallback(current => {
@@ -157,8 +206,6 @@ const App = () => {
         dispatch('change', { key, value });
     }, []);
 
-    const perm = ({ role, level, id }) => {};
-
     const runHook = useCallback(async (hook, options) => {
         const defaultOptions = {
             event: true,
@@ -174,21 +221,13 @@ const App = () => {
 
         console.log(`Starting '${hook}' hook...`);
 
-        const includeHooks = BOOT_HOOKS.includes(hook);
-
         if (options.event === true) {
-            dispatch(hook, {
-                BOOT_HOOKS: includeHooks ? BOOT_HOOKS : undefined,
-            });
+            dispatch(hook);
         }
 
         if (options.synchronous === true) {
             try {
-                Reactium.Hook.runSync(
-                    hook,
-                    state,
-                    includeHooks ? BOOT_HOOKS : null,
-                );
+                Reactium.Hook.runSync(hook, state);
             } catch (err) {
                 console.log(err);
             }
@@ -196,22 +235,10 @@ const App = () => {
 
         if (options.asynchronous === true) {
             try {
-                await Reactium.Hook.run(
-                    hook,
-                    state,
-                    includeHooks ? BOOT_HOOKS : null,
-                );
+                await Reactium.Hook.run(hook, state);
             } catch (err) {
                 console.log(err);
             }
-        }
-
-        if (hook === 'init') actiniumINIT();
-
-        if (hook === 'sdk-init') {
-            if (!state.get('actinium')) return;
-            const user = await Reactium.User.currentAsync();
-            state.set('user', user ? user.id : false);
         }
 
         const endTime = performance.now();
@@ -240,12 +267,61 @@ const App = () => {
             return false;
         }
 
+        if (state.get('userINIT') !== true) {
+            return false;
+        }
+
         return true;
     });
 
+    const userINIT = async () => {
+        if (state.get('actinium')) {
+            const user = await state.User.currentAsync();
+            state.User.current = () => user;
+        }
+        await runHook('user');
+        state.set('userINIT', true);
+    };
+
+    // External Interface: Extensions
+    state.extend('getStatus', getStatus);
+    state.extend('isStatus', isStatus);
+    state.extend('rerender', () => state.set('updated', Date.now()));
+    state.extend('routeChanged', onRouteChange);
+    state.extend('runHook', runHook);
+    state.extend('shouldRender', shouldRender);
+    state.extend('setStatus', setStatus);
+
+    state.User.current = () => null;
+
+    state.User.can = can;
+
+    state.User.auth = async (u, p) => {
+        await runHook('before-auth');
+        const user = await Reactium.User.logIn(u, p);
+        state.User.current = () => user;
+        await runHook('auth');
+        return user;
+    };
+
+    state.User.logOut = async () => {
+        await runHook('before-signout');
+        await logout();
+        state.User.current = () => null;
+        await runHook('signout');
+    };
+
+    // Setup user
+    useEffect(() => {
+        if (!state.User.current()) {
+            userINIT();
+        }
+    }, []);
+
     // Status change
     useEffect(() => {
-        if (prevStatus === status) return;
+        if (state.status === status) return;
+
         switch (status) {
             case STATUS.STARTING:
                 loadHooks();
@@ -258,14 +334,21 @@ const App = () => {
             case STATUS.READY:
                 done();
                 break;
+
+            case STATUS.DONE:
+                state.set('updated', Date.now());
+                runHook('rendering');
+                break;
         }
 
-        setPrevStatus(status);
+        state.status = status;
+        state.set('updated', Date.now());
     }, [status]);
 
     // Navigation created
     useEffect(() => {
         Reactium.Navigator = navigation;
+        state.set('updated', Date.now());
     }, [navigation]);
 
     // AppState change
@@ -279,12 +362,6 @@ const App = () => {
 
     // state change
     useEventEffect(state, { set: onStateChange });
-
-    // External Interface: Extensions
-    state.extend('rerender', () => state.set('updated', Date.now()));
-    state.extend('routeChanged', onRouteChange);
-    state.extend('runHook', runHook);
-    state.extend('shouldRender', shouldRender);
 
     // External Interface: register handle 'AppState'
     useRegisterHandle('app', () => state);
