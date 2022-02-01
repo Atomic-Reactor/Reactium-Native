@@ -1,5 +1,5 @@
 import op from 'object-path';
-import React, { forwardRef, useEffect } from 'react';
+import React, { forwardRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import Reactium, { useHandle, useHookComponent } from 'reactium-core/sdk';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -12,7 +12,11 @@ let Navigator = ({ route = 'home', ...props }, ref) => {
 
     const validateRoute = route => {
         const perms = op.get(route, 'permission');
-        return !perms ? true : app.User.can(perms);
+        return !perms
+            ? true
+            : typeof perms === 'function'
+            ? perms({ route, user: app.User })
+            : app.User.can(perms);
     };
 
     return (
