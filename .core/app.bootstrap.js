@@ -14,6 +14,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import Reactium, {
     ComponentEvent,
+    useAsyncEffect,
     useEventEffect,
     useHookComponent,
     useRegisterHandle,
@@ -27,6 +28,7 @@ const STATUS = {
     BOOTUP: 2,
     READY: 3,
     DONE: 4,
+    FETCHING: 5,
 };
 
 const BOOT_HOOKS = [
@@ -57,12 +59,20 @@ const App = () => {
             current: 'home',
             updated: Date.now(),
         },
-        userINIT: false,
     });
 
-    state.User = Reactium.User;
+    if (!state.User) {
+        state.User = Reactium.User;
+        state.User.current = () => null;
+        if (!state.User.current) {
+            state.User.current = () => null;
+        }
+    }
 
     const dispatch = Reactium.useDispatcher({ state });
+    const [userStats, setUserStatus, isUserStatus] = useStatus(
+        STATUS.PENDING,
+    );
     const [status, setStatus, isStatus, getStatus] = useStatus(STATUS.STARTING);
 
     const [navigation, updateNavigation] = useState(null);
@@ -123,7 +133,6 @@ const App = () => {
     };
 
     const bootup = useCallback(async () => {
-        console.log('');
         for (let hook of BOOT_HOOKS) {
             await runHook(hook);
         }
@@ -132,6 +141,10 @@ const App = () => {
     });
 
     const done = useCallback(async () => {
+        if (!isUserStatus(STATUS.DONE)) {
+            _.defer(() => done());
+            return;
+        }
         await runHook('ready');
         setStatus(STATUS.DONE, true);
     });
@@ -206,7 +219,7 @@ const App = () => {
         dispatch('change', { key, value });
     }, []);
 
-    const runHook = useCallback(async (hook, options) => {
+    const runHook = async (hook, options) => {
         const defaultOptions = {
             event: true,
             synchronous: true,
@@ -247,7 +260,7 @@ const App = () => {
 
         console.log(`Finished '${hook}' after ${elapsed} ms`);
         console.log('');
-    });
+    };
 
     const setNavigation = useCallback(value => {
         if (navigation || !value) return;
@@ -267,7 +280,7 @@ const App = () => {
             return false;
         }
 
-        if (state.get('userINIT') !== true) {
+        if (!isUserStatus(STATUS.DONE)) {
             return false;
         }
 
@@ -275,12 +288,15 @@ const App = () => {
     });
 
     const userINIT = async () => {
-        if (state.get('actinium')) {
-            const user = await state.User.currentAsync();
-            state.User.current = () => user;
-        }
+        if (!isUserStatus(STATUS.PENDING)) return;
+        setUserStatus(STATUS.FETCHING);
+
+        const u = await state.User.currentAsync();
+
+        state.User.current = () => u;
+
         await runHook('user');
-        state.set('userINIT', true);
+        setUserStatus(STATUS.DONE);
     };
 
     // External Interface: Extensions
@@ -292,13 +308,12 @@ const App = () => {
     state.extend('shouldRender', shouldRender);
     state.extend('setStatus', setStatus);
 
-    state.User.current = () => null;
-
     state.User.can = can;
 
     state.User.auth = async (u, p) => {
         await runHook('before-auth');
         const user = await Reactium.User.logIn(u, p);
+        // Reactium.User.current = () => user;
         state.User.current = () => user;
         await runHook('auth');
         return user;
@@ -310,40 +325,6 @@ const App = () => {
         state.User.current = () => null;
         await runHook('signout');
     };
-
-    // Setup user
-    useEffect(() => {
-        if (!state.User.current()) {
-            userINIT();
-        }
-    }, []);
-
-    // Status change
-    useEffect(() => {
-        if (state.status === status) return;
-
-        switch (status) {
-            case STATUS.STARTING:
-                loadHooks();
-                break;
-
-            case STATUS.BOOTUP:
-                bootup();
-                break;
-
-            case STATUS.READY:
-                done();
-                break;
-
-            case STATUS.DONE:
-                state.set('updated', Date.now());
-                runHook('rendering');
-                break;
-        }
-
-        state.status = status;
-        state.set('updated', Date.now());
-    }, [status]);
 
     // Navigation created
     useEffect(() => {
@@ -359,6 +340,36 @@ const App = () => {
             subscription.remove();
         };
     }, []);
+
+    // Status change
+    useAsyncEffect(async () => {
+        if (state.status === status) return;
+
+        switch (status) {
+            case STATUS.STARTING:
+                console.log('');
+
+                await userINIT();
+                await loadHooks();
+                break;
+
+            case STATUS.BOOTUP:
+                await bootup();
+                break;
+
+            case STATUS.READY:
+                await done();
+                break;
+
+            case STATUS.DONE:
+                state.set('updated', Date.now());
+                await runHook('rendering');
+                break;
+        }
+
+        state.status = status;
+        state.set('updated', Date.now());
+    }, [status]);
 
     // state change
     useEventEffect(state, { set: onStateChange });
