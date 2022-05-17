@@ -1,6 +1,6 @@
 const manifestGen = require('./manifest-gen');
 
-const reactiumTasks = (gulp, config, task) => {
+const reactiumTasks = (gulp, config) => {
     const manifest = done => {
         manifestGen(config);
         done();

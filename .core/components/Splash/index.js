@@ -1,31 +1,36 @@
+import _ from 'underscore';
 import React, { useEffect } from 'react';
 import SplashScreen from 'react-native-splash-screen';
-import Reactium, { useSyncState } from 'reactium-core/sdk';
 import AnimatedSplash from 'react-native-animated-splash-screen';
 
+import Reactium, {
+    useHandle,
+    useEventEffect,
+    useSyncState,
+} from 'reactium-core/sdk';
+
 const Component = ({ children, ...props }) => {
+    const app = useHandle('app');
+    const newProps = { ...props };
+
+    Reactium.Hook.runSync('splash-screen', newProps);
+
     const state = useSyncState({
-        ...props,
+        ...newProps,
+        isLoaded: false,
     });
 
-    useEffect(() => {
-        SplashScreen.hide();
-
-        const newProps = { ...state.get() };
-
-        Reactium.Hook.runSync('splash-screen', newProps);
-
-        delete newProps.isLoaded;
-
-        state.set(newProps);
-    }, []);
+    const onRendered = () => {
+        state.set('isLoaded', true);
+    };
 
     useEffect(() => {
-        const isLoaded = state.get('isLoaded');
-        if (isLoaded !== props.isLoaded) {
-            state.set('isLoaded', props.isLoaded);
+        if (state.get('isLoaded') === true) {
+            SplashScreen.hide();
         }
-    }, [props.isLoaded]);
+    }, [state.get('isLoaded')]);
+
+    useEventEffect(app, { rendered: onRendered });
 
     return <AnimatedSplash {...state.get()} children={children} />;
 };

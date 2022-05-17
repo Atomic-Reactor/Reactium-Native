@@ -32,7 +32,6 @@ const GulpRegistry = ReactiumGulp.Utils.registryFactory(
 ReactiumGulp.Hook.runSync('config', config);
 
 // Register default tasks
-const taskPlaceholder = require('./get-task')(gulp);
 const tasks = require('./gulp.tasks')(gulp, config);
 Object.entries(tasks).forEach(([name, task]) =>
     GulpRegistry.register(name, {
